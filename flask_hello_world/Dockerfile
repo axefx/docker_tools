@@ -1,14 +1,8 @@
-FROM ubuntu:14.04
-
-RUN apt-get update
-RUN apt-get install -y python
-RUN apt-get install -y python-pip
-RUN apt-get clean all
-
-RUN pip install flask
-
-ADD hello.py /tmp/hello.py
-
-EXPOSE 5000
-
-CMD ["python", "/tmp/hello.py"]
+FROM python:3.8-slim-buster as flask_hello_world
+ENV PYTHONUNBUFFERED 1
+RUN python -m pip install --upgrade pip && pip install pipenv
+COPY Pipfile* ./
+RUN pipenv install --system --deploy
+COPY ./app ./app
+EXPOSE 8000
+CMD uvicorn app.main:app --host 0.0.0.0 --port 8000
